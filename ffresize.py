@@ -1,13 +1,16 @@
 import subprocess
 import os
 import sys
+import mimetypes
 
-def is_file_video(filename):
-        result = subprocess.run(['ffprobe', '-v', 'error', '-select_streams', 'v:0', '-show_entries', 'stream=codec_type', '-of', 'default=noprint_wrappers=1:nokey=1', '-i', filename], capture_output=True, text=True)
-        codec_type = result.stdout.strip()
-        return codec_type == 'video'
+def is_file_video(filename: str) -> bool:
+    mimetype = mimetypes.guess_type(filename)
+    if (not mimetype or not mimetype[0]):
+        return False
 
-def get_audio_size(input_file, duration):
+    return mimetype[0].startswith("video/")
+
+def get_audio_size(input_file: str, duration: float) -> float:
     # get audio bitrate in bits
     ffprobe_cmd = ['ffprobe', '-v', 'error', '-select_streams', 'a:0', '-show_entries', 'stream=bit_rate', '-of', 'default=noprint_wrappers=1:nokey=1', input_file]
     result = subprocess.check_output(ffprobe_cmd).strip()
@@ -25,7 +28,7 @@ def get_audio_size(input_file, duration):
 
     return num_audio_tracks * duration * audio_bitrate
 
-def reencode_to_target_size(input_file, output_file, target_size):
+def reencode_to_target_size(input_file: str, output_file: str, target_size: int):
     if not os.path.exists(input_file):
         print(f"{input_file} not found")
         return

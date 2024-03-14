@@ -1,16 +1,19 @@
 import subprocess
 import os
 import random
+import mimetypes
 
-def is_file_video(filename):
-        result = subprocess.run(['ffprobe', '-v', 'error', '-select_streams', 'v:0', '-show_entries', 'stream=codec_type', '-of', 'default=noprint_wrappers=1:nokey=1', '-i', filename], capture_output=True, text=True)
-        codec_type = result.stdout.strip()
-        return codec_type == 'video'
+def is_file_video(filename: str) -> bool:
+    mimetype = mimetypes.guess_type(filename)
+    if (not mimetype or not mimetype[0]):
+        return False
+    
+    return mimetype[0].startswith("video/")
 
-def get_random_size(filesize):
+def get_random_size(filesize: int) -> int:
         return random.randrange(1, int(filesize))
         
-def run_ffresize(input_file, output_file, target_size):
+def run_ffresize(input_file: str, output_file: str, target_size: int):
         subprocess.run(["py", "ffresize.py", input_file, output_file, str(target_size)], check=True)
 
 if __name__ == "__main__":
