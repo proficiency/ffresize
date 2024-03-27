@@ -50,7 +50,9 @@ def reencode_to_target_size(input_file: str, output_file: str, target_size: int)
     video_bitrate = int(target_size / duration)
 
     # reencode with our new bitrate
-    ffmpeg_cmd = ['ffmpeg', '-i', input_file, '-b:v', str(video_bitrate) + 'k', '-y', output_file]
+    ffmpeg_cmd = ['ffmpeg', '-i', input_file, '-pass', '1', '-b:v', str(video_bitrate) + 'k', '-y', output_file]
+    subprocess.run(ffmpeg_cmd)
+    ffmpeg_cmd = ['ffmpeg', '-i', input_file, '-pass', '2', '-b:v', str(video_bitrate) + 'k', '-y', output_file]
     subprocess.run(ffmpeg_cmd)
 
 
